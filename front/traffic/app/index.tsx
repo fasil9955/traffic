@@ -1,40 +1,50 @@
 // index.tsx
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 interface Hospital {
-  id: number;
+  _id: string; // MongoDB ObjectId as a string
   name: string;
   latitude: number;
   longitude: number;
 }
 
 export default function SelectHospitalScreen() {
-  // Hardcoded hospital data
-  const hospitals: Hospital[] = [
-    { id: 1, name: 'Hospital A', latitude: 12.914142, longitude: 74.855957 },
-    { id: 2, name: 'Hospital B', latitude: 34.052235, longitude: -118.243683 },
-    { id: 3, name: 'Hospital C', latitude: 37.774929, longitude: -122.419418 },
-  ];
-
-  // State variables for dropdown picker
-  const [open, setOpen] = useState(false); // Controls whether the dropdown is open
-  const [selectedHospital, setSelectedHospital] = useState<string | null>(null); // Currently selected hospital value
+  const [hospitals, setHospitals] = useState<Hospital[]>([]); // State for hospital data
+  const [loading, setLoading] = useState<boolean>(true); // State for loading status
+  const [open, setOpen] = useState(false);
+  const [selectedHospital, setSelectedHospital] = useState<string | null>(null);
   const router = useRouter();
+
+  // Fetch hospitals from the backend
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        const response = await axios.get('http://192.168.1.101:3000/hospitals'); // Replace with your backend URL
+        setHospitals(response.data); // Set the fetched hospitals in state
+      } catch (error) {
+        Alert.alert('Error', 'Failed to fetch hospitals'); // Handle errors
+      } finally {
+        setLoading(false); // Set loading to false after fetching
+      }
+    };
+
+    fetchHospitals(); // Call the fetch function
+  }, []);
 
   const handleStartJourney = () => {
     if (selectedHospital) {
-      const hospital = hospitals.find(h => h.name === selectedHospital); // Find the selected hospital from the list
+      const hospital = hospitals.find(h => h.name === selectedHospital);
       if (hospital) {
-        // Navigate to the MapScreen with selected hospital data
         router.push({
           pathname: '/map',
           params: {
             name: hospital.name,
-            latitude: hospital.latitude.toString(), // Convert to string to avoid type issues
-            longitude: hospital.longitude.toString(), // Convert to string to avoid type issues
+            latitude: hospital.latitude.toString(),
+            longitude: hospital.longitude.toString(),
           },
         });
       }
@@ -47,27 +57,33 @@ export default function SelectHospitalScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Select a Hospital</Text>
 
-      <DropDownPicker
-        open={open} // Whether the dropdown is open
-        value={selectedHospital} // Current selected value
-        items={hospitals.map(hospital => ({
-          label: hospital.name,
-          value: hospital.name,
-        }))} // Convert hospitals data to dropdown items
-        setOpen={setOpen} // Function to set the open state
-        setValue={setSelectedHospital} // Function to set the selected value
-        placeholder="Select a hospital..." // Placeholder text
-        searchable={true} // Enable searching
-        searchPlaceholder="Search for a hospital..." // Placeholder for search input
-        style={styles.picker} // Picker style
-        containerStyle={styles.pickerContainer} // Container style
-        dropDownContainerStyle={styles.dropDownContainer} // Dropdown container style
-        listMode="SCROLLVIEW" // Allows scrolling for the dropdown list
-      />
+      {loading ? ( // Show loading indicator while fetching data
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : (
+        <>
+          <DropDownPicker
+            open={open}
+            value={selectedHospital}
+            items={hospitals.map(hospital => ({
+              label: hospital.name,
+              value: hospital.name,
+            }))}
+            setOpen={setOpen}
+            setValue={setSelectedHospital}
+            placeholder="Select a hospital..."
+            searchable={true}
+            searchPlaceholder="Search for a hospital..."
+            style={styles.picker}
+            containerStyle={styles.pickerContainer}
+            dropDownContainerStyle={styles.dropDownContainer}
+            listMode="SCROLLVIEW"
+          />
 
-      <TouchableOpacity style={styles.button} onPress={handleStartJourney}>
-        <Text style={styles.buttonText}>Start Journey</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleStartJourney}>
+            <Text style={styles.buttonText}>Start Journey</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }

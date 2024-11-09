@@ -8,7 +8,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import io from 'socket.io-client';
 
-const SOCKET_SERVER_URL = 'YOUR_SOCKET_SERVER_URL'; // Replace with your server URL
+const SOCKET_SERVER_URL = 'http://192.168.1.101:3000'; // Replace with your server URL
 
 export default function MapScreen() {
   const router = useRouter();
@@ -39,8 +39,9 @@ export default function MapScreen() {
 
       const location = await Location.getCurrentPositionAsync({});
       setCurrentLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+         latitude: location.coords.latitude,
+         longitude: location.coords.longitude,
+       
       });
     };
 
@@ -61,10 +62,19 @@ export default function MapScreen() {
   // Function to share live location
   const shareLiveLocation = () => {
     if (socket && currentLocation) {
-      socket.emit('liveLocation', currentLocation);
-      console.log('Live location shared:', currentLocation);
+      socket.emit('liveLocation', currentLocation);  
+     console.log('Live location shared:', currentLocation);
     }
   };
+
+  //function to share route
+  const shareRoute = () => {
+    if (socket && routePolyline) {
+      socket.emit('routeCoordinates', decodePolyline(routePolyline));
+    } else {
+      console.error("routePolyline is null");
+    }
+  } 
 
   // Function to check if the destination is reached
   const checkDestinationReached = () => {
@@ -133,6 +143,7 @@ export default function MapScreen() {
         setRoutePolyline(data.routes[0].overview_polyline);
         setDistance(data.routes[0].distance); // Set distance
         setDuration(data.routes[0].duration); // Set duration
+      
       } else {
         Alert.alert('Error', data.reason || 'Unable to fetch directions.');
       }
@@ -160,6 +171,7 @@ export default function MapScreen() {
     if (!isJourneyStarted) {
       setIsJourneyStarted(true);
       setShowStartButton(false); // Hide the start button
+      shareRoute();
 
       // Zoom to the current location
       if (mapRef.current && currentLocation) {
@@ -222,8 +234,11 @@ export default function MapScreen() {
                 coordinates={decodePolyline(routePolyline)}
                 strokeWidth={4}
                 strokeColor="hotpink"
+               
+                
               />
             )}
+            
           </MapView>
         )
       )}

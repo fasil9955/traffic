@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Optional: Ignore build files if using a bundler (e.g., Webpack)
+dist/
+build/
+
+# IDE/editor specific files
+.vscode/
+.idea/
