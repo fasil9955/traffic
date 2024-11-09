@@ -20,4 +20,4 @@ const junctionSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model('Junction', junctionSchema);
+module.exports = mongoose.model('Junction', junctionSchema,'trafficlights');

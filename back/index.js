@@ -5,7 +5,7 @@ const { Server } = require('socket.io');
 const connectDB = require('./config/db');
 const dotenv = require('dotenv');
 const apiRoutes = require('./routes/apiRoutes');
-// const { checkProximity } = require('./controllers/TrafficLightController');
+const { checkProximity } = require('./controllers/TrafficLightController'); 
 
 dotenv.config();
 connectDB();
@@ -32,15 +32,9 @@ io.on('connection', (socket) => {
 // Listen for live location updates from the frontend
 socket.on('liveLocation', async (location) => {
     console.log('Live location received:', location);
-    // await checkProximity(location, io);
+    await checkProximity(location, io);
   });
-  
-  // Listen for route coordinates sent from the frontend
-  socket.on('routeCoordinates', (route) => {
-    console.log('Route coordinates received:', route);
-    
-    // Process the route coordinates as needed
-  });
+
   
 
   socket.on('disconnect', () => {

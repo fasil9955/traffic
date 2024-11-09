@@ -39,8 +39,10 @@ export default function MapScreen() {
 
       const location = await Location.getCurrentPositionAsync({});
       setCurrentLocation({
-         latitude: location.coords.latitude,
-         longitude: location.coords.longitude,
+        //  latitude: location.coords.latitude,
+        //  longitude: location.coords.longitude,
+         latitude: 12.8694,
+         longitude: 74.8629,
        
       });
     };
