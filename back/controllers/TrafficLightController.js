@@ -76,17 +76,17 @@ const checkProximity = async (location, adminNamespace) => {
             });
 
             // Start a 1-minute timer to turn off the traffic light
-            setTimeout(() => {
-              console.log(`1 minute passed, turning off traffic light at junction: ${junction.junctionName}`);
+          //  setTimeout(() => {
+          //     console.log(`1 minute passed, turning off traffic light at junction: ${junction.junctionName}`);
 
-              adminNamespace.emit('turnOffTrafficLight', {
-                trafficLight,
-                junctionName: junction.junctionName,
-              });
+          //     adminNamespace.emit('turnOffTrafficLight', {
+          //       trafficLight,
+          //       junctionName: junction.junctionName,
+          //     });
 
-              // Optionally, remove the traffic light from the processed set if you want to allow re-processing after turn-off
-              processedTrafficLights.delete(trafficLight);
-            }, 60000); // 60000 milliseconds = 1 minute
+          //     // Optionally, remove the traffic light from the processed set if you want to allow re-processing after turn-off
+          //     processedTrafficLights.delete(trafficLight);
+          //   }, 60000); // 60000 milliseconds = 1 minute
           } else {
             console.log(`Message for traffic light ${trafficLight} already sent. Skipping.`);
           }
