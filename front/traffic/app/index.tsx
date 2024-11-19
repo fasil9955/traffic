@@ -23,7 +23,9 @@ export default function SelectHospitalScreen() {
   useEffect(() => {
     const fetchHospitals = async () => {
       try {
-        const response = await axios.get('http://192.168.1.101:3000/hospitals'); // Replace with your backend URL
+      const response = await axios.get('https://traffic-51jp.onrender.com/hospitals'); // Replace with your backend URL
+    //    const response = await axios.get('http://172.21.7.224:3000/hospitals'); // Replace with your backend URL
+
         setHospitals(response.data); // Set the fetched hospitals in state
       } catch (error) {
         Alert.alert('Error', 'Failed to fetch hospitals'); // Handle errors

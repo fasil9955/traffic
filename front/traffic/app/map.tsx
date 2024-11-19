@@ -8,7 +8,8 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import io from 'socket.io-client';
 
-const SOCKET_SERVER_URL = 'http://192.168.1.101:3000'; // Replace with your server URL
+ const SOCKET_SERVER_URL = 'https://traffic-51jp.onrender.com'; // Replace with your server URL
+//const SOCKET_SERVER_URL = 'http://172.21.7.224:3000'; // Replace with your server URL
 
 export default function MapScreen() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function MapScreen() {
       setCurrentLocation({
         //  latitude: location.coords.latitude,
         //  longitude: location.coords.longitude,
-         latitude: 12.8694,
+        latitude: 12.8694,
          longitude: 74.8629,
        
       });
@@ -52,12 +53,13 @@ export default function MapScreen() {
 
   // Set up socket connection
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL);
-    setSocket(newSocket);
+    const frontendSocket = io(`${SOCKET_SERVER_URL}/frontend`); // Connect to the '/frontend' namespace
+    setSocket(frontendSocket);
 
     // Cleanup on component unmount
     return () => {
-      newSocket.disconnect();
+      frontendSocket.disconnect();
+   
     };
   }, []);
 
@@ -70,13 +72,13 @@ export default function MapScreen() {
   };
 
   //function to share route
-  const shareRoute = () => {
-    if (socket && routePolyline) {
-      socket.emit('routeCoordinates', decodePolyline(routePolyline));
-    } else {
-      console.error("routePolyline is null");
-    }
-  } 
+  // const shareRoute = () => {
+  //   if (socket && routePolyline) {
+  //     socket.emit('routeCoordinates', decodePolyline(routePolyline));
+  //   } else {
+  //     console.error("routePolyline is null");
+  //   }
+  // } 
 
   // Function to check if the destination is reached
   const checkDestinationReached = () => {
@@ -173,7 +175,7 @@ export default function MapScreen() {
     if (!isJourneyStarted) {
       setIsJourneyStarted(true);
       setShowStartButton(false); // Hide the start button
-      shareRoute();
+      // shareRoute();
 
       // Zoom to the current location
       if (mapRef.current && currentLocation) {
@@ -254,7 +256,7 @@ export default function MapScreen() {
         </TouchableOpacity>
       )}
 
-{isJourneyStarted && (
+{/* {isJourneyStarted && (
     <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
             Distance: {distance ? `${(distance / 1000).toFixed(2)} km` : '...'}
@@ -263,7 +265,7 @@ export default function MapScreen() {
             Estimated Time: {duration ? `${Math.ceil(duration / 60)} min` : '...'}
         </Text>
     </View>
-)}
+)} */}
     </View>
   );
 }

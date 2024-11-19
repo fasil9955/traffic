@@ -25,20 +25,52 @@ app.use(express.json());
 // Use combined API routes
 app.use('/', apiRoutes);
 
-// Socket.io connection
-io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
+// // Socket.io connection
 
-// Listen for live location updates from the frontend
-socket.on('liveLocation', async (location) => {
-    console.log('Live location received:', location);
-    await checkProximity(location, io);
-  });
+// io.on('connection', (socket) => {
+//   console.log('New client connected:', socket.id);
+
+// // Listen for live location updates from the frontend
+// socket.on('liveLocation', async (location) => {
+//     console.log('Live location received:', location);
+//     await checkProximity(location, io);
+//   });
 
   
 
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected:', socket.id);
+//   });
+// });
+// Admin namespace
+const adminNamespace = io.of('/admin');
+
+// Admin-specific connection
+adminNamespace.on('connection', (socket) => {
+  console.log(`Admin client connected: ${socket.id}`);
+
+  // Handle admin client disconnection
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+    console.log(`Admin client disconnected: ${socket.id}`);
+  });
+});
+
+// Frontend namespace
+const frontendNamespace = io.of('/frontend');
+
+// Frontend-specific connection
+frontendNamespace.on('connection', (socket) => {
+  console.log(`Frontend client connected: ${socket.id}`);
+
+  // Listen for live location updates from the frontend
+  socket.on('liveLocation', async (location) => {
+    console.log('Live location received from frontend:', location);
+    await checkProximity(location, adminNamespace);
+  });
+
+  // Handle frontend client disconnection
+  socket.on('disconnect', () => {
+    console.log(`Frontend client disconnected: ${socket.id}`);
   });
 });
 
